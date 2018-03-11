@@ -1,5 +1,6 @@
 library(limma)
-parent = "/Users/zhongningchen/Data/miRNA"
+library(edgeR)
+parent = "C:/Users/kabau/Desktop/Data/miRNA"
 tumorStageList = c("stage_ia", "stage_ib", "stage_iia", "stage_iib", "stage_iii", "stage_iv")
 ReadmiRNA = function(cancerType, sample, tumorStage){
   #creates dataframe given Cancer type and tumor stage. 
@@ -44,8 +45,18 @@ near_zero_var = function(X, i){
     return(((u > .1)))
   }
 }
+getDF = function(ct, mi){
+  df1 = ReadmiRNA(ct, "PrimaryTumor", tumorStageList[1])[mi,]
+  df2 = ReadmiRNA(ct, "PrimaryTumor", tumorStageList[2])[mi,]
+  df3 = ReadmiRNA(ct, "PrimaryTumor", tumorStageList[3])[mi,]
+  df4 = ReadmiRNA(ct, "PrimaryTumor", tumorStageList[4])[mi,]
+  df5 = ReadmiRNA(ct, "PrimaryTumor", tumorStageList[5])[mi,]
+  df6 = ReadmiRNA(ct, "PrimaryTumor", tumorStageList[6])[mi,]
+  
+  return(list(df.1 = df1, df.2 = df2, df.3 = df3, df.4 = df4, df.5= df5, df.6= df6))
+}
 DE_voom = function(ct, a,b, p.threshold = 0.05){
-
+  
   LUAD.1 = ReadmiRNA(ct, "PrimaryTumor", tumorStageList[a])
   LUAD.2 = ReadmiRNA(ct, "PrimaryTumor", tumorStageList[b])
   LUAD.2 = add_Label(LUAD.2, tumorStageList[a])
@@ -68,7 +79,7 @@ DE_voom = function(ct, a,b, p.threshold = 0.05){
   LUAD.12 = t(LUAD.12)
   LUAD.nf <- calcNormFactors(LUAD.12)
   LUAD.v <- voom(LUAD.12, LUAD.design, lib.size=colSums(LUAD.12)*LUAD.nf, 
-            normalize.method="quantile", plot=TRUE)
+                 normalize.method="quantile", plot=TRUE)
   
   # Usual limma pipeline
   LUAD.fit.voom <- lmFit(LUAD.v, LUAD.design)
@@ -80,8 +91,7 @@ DE_voom = function(ct, a,b, p.threshold = 0.05){
   
   return(LUAD.genes.voom)
 }
-
-
+{
 geneList.LUAD.1.2 = DE_voom("LUAD", 1, 2)
 geneList.LUAD.1.3 = DE_voom("LUAD", 1, 3)
 geneList.LUAD.1.4 = DE_voom("LUAD", 1, 4)
@@ -98,18 +108,92 @@ geneList.LUAD.4.5 = DE_voom("LUAD", 4, 5)
 geneList.LUAD.4.6 = DE_voom("LUAD", 4, 6)
 geneList.LUAD.5.6 = DE_voom("LUAD", 5, 6)
 
-geneList.LUSC.1.2 = DE_voom("LUSC", 1, 2, p.threshold = .1)
-geneList.LUSC.1.3 = DE_voom("LUSC", 1, 3, p.threshold = .1)
-geneList.LUSC.1.4 = DE_voom("LUSC", 1, 4, p.threshold = .1)
-geneList.LUSC.1.5 = DE_voom("LUSC", 1, 5, p.threshold = .1)
-geneList.LUSC.1.6 = DE_voom("LUSC", 1, 6, p.threshold = .1)
-geneList.LUSC.2.3 = DE_voom("LUSC", 2, 3, p.threshold = .1)
-geneList.LUSC.2.4 = DE_voom("LUSC", 2, 4, p.threshold = .1)
-geneList.LUSC.2.5 = DE_voom("LUSC", 2, 5, p.threshold = .1)
-geneList.LUSC.2.6 = DE_voom("LUSC", 2, 6, p.threshold = .1)
-geneList.LUSC.3.4 = DE_voom("LUSC", 3, 4, p.threshold = .1)
-geneList.LUSC.3.5 = DE_voom("LUSC", 3, 5, p.threshold = .1)
-geneList.LUSC.3.6 = DE_voom("LUSC", 3, 6, p.threshold = .1)
-geneList.LUSC.4.5 = DE_voom("LUSC", 4, 5, p.threshold = .1)
-geneList.LUSC.4.6 = DE_voom("LUSC", 4, 6, p.threshold = .1)
-geneList.LUSC.5.6 = DE_voom("LUSC", 5, 6, p.threshold = .1)
+geneList.LUSC.1.2 = DE_voom("LUSC", 1, 2)
+geneList.LUSC.1.3 = DE_voom("LUSC", 1, 3)
+geneList.LUSC.1.4 = DE_voom("LUSC", 1, 4)
+geneList.LUSC.1.5 = DE_voom("LUSC", 1, 5)
+geneList.LUSC.1.6 = DE_voom("LUSC", 1, 6)
+geneList.LUSC.2.3 = DE_voom("LUSC", 2, 3)
+geneList.LUSC.2.4 = DE_voom("LUSC", 2, 4)
+geneList.LUSC.2.5 = DE_voom("LUSC", 2, 5)
+geneList.LUSC.2.6 = DE_voom("LUSC", 2, 6)
+geneList.LUSC.3.4 = DE_voom("LUSC", 3, 4)
+geneList.LUSC.3.5 = DE_voom("LUSC", 3, 5)
+geneList.LUSC.3.6 = DE_voom("LUSC", 3, 6)
+geneList.LUSC.4.5 = DE_voom("LUSC", 4, 5)
+geneList.LUSC.4.6 = DE_voom("LUSC", 4, 6)
+geneList.LUSC.5.6 = DE_voom("LUSC", 5, 6)
+}
+{
+  parent = "C:/Users/kabau/Desktop/Data/miRNA/Limma_to_ENSG/LUAD"
+  library(biomaRt)
+  mart = useEnsembl(biomart="ensembl", dataset="hsapiens_gene_ensembl")
+  desired_attributes = c("mirbase_id", "ensembl_gene_id", "external_gene_name", "chromosome_name", "start_position", "end_position")
+  ensg = getBM(attributes= desired_attributes, filters = 'mirbase_id', 
+               values = geneList.LUAD.4.6, mart = mart)
+  write.table(ensg, paste(parent, "LUAD_46.txt", sep = "/"))
+}
+{
+parent = "C:/Users/kabau/Desktop/Data/miRNA/Limma_results"
+
+write.table(geneList.LUAD.1.2, paste(parent, "LUAD", "LUAD_12.txt", sep = "/"))
+write.table(geneList.LUAD.1.3, paste(parent, "LUAD", "LUAD_13.txt", sep = "/"))
+write.table(geneList.LUAD.1.4, paste(parent, "LUAD", "LUAD_14.txt", sep = "/"))
+write.table(geneList.LUAD.1.5, paste(parent, "LUAD", "LUAD_15.txt", sep = "/"))
+write.table(geneList.LUAD.1.6, paste(parent, "LUAD", "LUAD_16.txt", sep = "/"))
+
+write.table(geneList.LUAD.2.3, paste(parent, "LUAD", "LUAD_23.txt", sep = "/"))
+write.table(geneList.LUAD.2.4, paste(parent, "LUAD", "LUAD_24.txt", sep = "/"))
+write.table(geneList.LUAD.2.5, paste(parent, "LUAD", "LUAD_25.txt", sep = "/"))
+write.table(geneList.LUAD.2.6, paste(parent, "LUAD", "LUAD_26.txt", sep = "/"))
+
+write.table(geneList.LUAD.3.4, paste(parent, "LUAD", "LUAD_34.txt", sep = "/"))
+write.table(geneList.LUAD.3.5, paste(parent, "LUAD", "LUAD_35.txt", sep = "/"))
+write.table(geneList.LUAD.3.6, paste(parent, "LUAD", "LUAD_36.txt", sep = "/"))
+
+write.table(geneList.LUAD.4.5, paste(parent, "LUAD", "LUAD_45.txt", sep = "/"))
+write.table(geneList.LUAD.4.6, paste(parent, "LUAD", "LUAD_46.txt", sep = "/"))
+
+write.table(geneList.LUAD.5.6, paste(parent, "LUAD", "LUAD_56.txt", sep = "/"))
+
+write.table(geneList.LUSC.1.2, paste(parent, "LUSC", "LUSC_12.txt", sep = "/"))
+write.table(geneList.LUSC.1.3, paste(parent, "LUSC", "LUSC_13.txt", sep = "/"))
+write.table(geneList.LUSC.1.4, paste(parent, "LUSC", "LUSC_14.txt", sep = "/"))
+write.table(geneList.LUSC.1.5, paste(parent, "LUSC", "LUSC_15.txt", sep = "/"))
+write.table(geneList.LUSC.1.6, paste(parent, "LUSC", "LUSC_16.txt", sep = "/"))
+
+write.table(geneList.LUSC.2.3, paste(parent, "LUSC", "LUSC_23.txt", sep = "/"))
+write.table(geneList.LUSC.2.4, paste(parent, "LUSC", "LUSC_24.txt", sep = "/"))
+write.table(geneList.LUSC.2.5, paste(parent, "LUSC", "LUSC_25.txt", sep = "/"))
+write.table(geneList.LUSC.2.6, paste(parent, "LUSC", "LUSC_26.txt", sep = "/"))
+
+write.table(geneList.LUSC.3.4, paste(parent, "LUSC", "LUSC_34.txt", sep = "/"))
+write.table(geneList.LUSC.3.5, paste(parent, "LUSC", "LUSC_35.txt", sep = "/"))
+write.table(geneList.LUSC.3.6, paste(parent, "LUSC", "LUSC_36.txt", sep = "/"))
+
+write.table(geneList.LUSC.4.5, paste(parent, "LUSC", "LUSC_45.txt", sep = "/"))
+write.table(geneList.LUSC.4.6, paste(parent, "LUSC", "LUSC_46.txt", sep = "/"))
+
+write.table(geneList.LUSC.5.6, paste(parent, "LUSC", "LUSC_56.txt", sep = "/"))
+
+}
+{
+common.12.16 = Reduce(intersect, list(geneList.LUAD.1.2, geneList.LUAD.1.4, geneList.LUAD.1.5, geneList.LUAD.1.6))
+common.12.15 = Reduce(intersect, list(geneList.LUAD.1.2, geneList.LUAD.1.4, geneList.LUAD.1.5))
+common.12.14 = Reduce(intersect, list(geneList.LUAD.1.2, geneList.LUAD.1.4))
+common.14.16 = Reduce(intersect, list(geneList.LUAD.1.4, geneList.LUAD.1.5, geneList.LUAD.1.6))
+common.14.15 = Reduce(intersect, list(geneList.LUAD.1.4, geneList.LUAD.1.5))
+common.15.16 = Reduce(intersect, list(geneList.LUAD.1.5, geneList.LUAD.1.6))
+}
+
+miRNA = getDF(ct = "LUAD", mi = common.12.16)
+{
+  m = c(apply(miRNA$df.1, 1, mean), 
+        apply(miRNA$df.2, 1, mean),
+        apply(miRNA$df.3, 1, mean),
+        apply(miRNA$df.4, 1, mean),
+        apply(miRNA$df.5, 1, mean),
+        apply(miRNA$df.6, 1, mean))
+  
+}
+
